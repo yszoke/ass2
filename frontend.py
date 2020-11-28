@@ -14,21 +14,54 @@ class MyGrid(Widget):
     location = ObjectProperty(None)
     time = ObjectProperty(None)
     reco = ObjectProperty(None)
-    def btn(self):
-        # results= backend.calcResults(self.location.text,self.time.text,self.reco.text) add to backend
-        results="results" #need to change
-        self.pop_results(results)
-        self.location.text=""
-        self.time.text=""
-        self.reco.text=""
-        # self.database.view()
 
-    def pop_results(self,results):
+    """ This function is called when the user press the button.
+        The function checks the user's input and calls to the backend function ______-
+        which returns the results according to the input"""
+    def btn(self):
+        if(self.time.text=="" or self.location.text=="" or self.reco.text==""):
+            self.pop_results("Error", "Please fill in all the text boxes")
+            self.location.text = ""
+            self.time.text = ""
+            self.reco.text = ""
+        elif (not all(x.isalpha() or x.isspace() for x in self.location.text)):
+            self.pop_results("Error", "Location must contain only letters")
+            self.location.text = ""
+            self.time.text = ""
+            self.reco.text = ""
+        elif (not self.time.text.isdecimal()):
+            self.pop_results("Error", "Time must contain only numbers")
+            self.location.text = ""
+            self.time.text = ""
+            self.reco.text = ""
+        elif (not self.reco.text.isdecimal()):
+            self.pop_results("Error", "Numbers of recommendation must contain only numbers")
+        elif (int(self.time.text)<1):
+            self.pop_results("Error", "The time must larger than 0")
+            self.location.text = ""
+            self.time.text = ""
+            self.reco.text = ""
+        elif (int(self.reco.text) < 1):
+            self.pop_results("Error", "The Numbers of recommendation must larger than 0")
+            self.location.text = ""
+            self.time.text = ""
+            self.reco.text = ""
+        else:
+            results= database.find_recommends(self.location.text,self.time.text,self.reco.text)
+            results="results" #need to change
+            self.pop_results('Recommended Locations',results)
+            self.location.text=""
+            self.time.text=""
+            self.reco.text=""
+            # self.database.view()
+
+    def pop_results(self,title,results):
         pop = Popup(title='Recommended Locations',
                     content=Label(text=results),
                     size_hint=(None, None), size=(400, 400))
 
         pop.open()
+
 
 class MyApp(App):
     def build(self):
@@ -36,5 +69,5 @@ class MyApp(App):
 
 
 if __name__ == "__main__":
-    # database=mybackend.database()
+    database=mybackend.Database()
     MyApp().run()
