@@ -57,3 +57,4 @@ class Database:
         ############### should return a pop up
         self.cur.execute("SELECT * FROM dataTable WHERE TripDurationinmin=?", (duration,))
         rows_duration=self.cur.fetchall()
+        return "test"
