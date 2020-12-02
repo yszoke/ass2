@@ -47,14 +47,18 @@ class Database:
             return
 
     """Performing a query, commit and close"""
-    def find_recommends(self, place, duration, recommends):
+    def find_recommends(self, place, duration, num_of_results):
         self.conn = sqlite3.connect('database.db')
         self.cur = self.conn.cursor()
-        self.cur.execute("SELECT * FROM dataTable WHERE StartStationName=?", (place,))
+        self.cur.execute("SELECT * FROM dataTable WHERE StartStationName=? AND TripDurationinmin<=?", (place,duration))
         rows_location=self.cur.fetchall()
         if len(rows_location)==0:
             return rows_location
-        ############### should return a pop up
-        self.cur.execute("SELECT * FROM dataTable WHERE TripDurationinmin=?", (duration,))
-        rows_duration=self.cur.fetchall()
-        return "test"
+        places={}
+        for i in range(len(rows_location)):
+            if len(places)<=int(num_of_results):
+                places[rows_location[i][8]]=rows_location[i][15]
+            else:
+                return list(places.keys())
+
+        return list(places.keys())

@@ -9,6 +9,7 @@ from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
 import mybackend
 
+
 import mybackend as backend
 class MyGrid(Widget):
     location = ObjectProperty(None)
@@ -48,7 +49,6 @@ class MyGrid(Widget):
             self.reco.text = ""
         else:
             results= database.find_recommends(self.location.text,self.time.text,self.reco.text)
-            results="results" #need to change
             self.pop_results('Recommended Locations',results)
             self.location.text=""
             self.time.text=""
@@ -56,11 +56,23 @@ class MyGrid(Widget):
             # self.database.view()
 
     def pop_results(self,title,results):
-        pop = Popup(title='Recommended Locations',
-                    content=Label(text=results),
+        layout = GridLayout(cols = 1, padding = 10)
+        if title == 'Recommended Locations':
+            for i in range(len(results)):
+                popupLabel = Label(text=results[i])
+                layout.add_widget(popupLabel)
+        else:
+            popupLabel = Label(text=results)
+            layout.add_widget(popupLabel)
+        closeButton = Button(text="Close the pop-up")
+        layout.add_widget(closeButton)
+        pop = Popup(title=title,
+                    content=layout,
                     size_hint=(None, None), size=(400, 400))
 
         pop.open()
+        closeButton.bind(on_press = pop.dismiss)
+
 
 
 class MyApp(App):
