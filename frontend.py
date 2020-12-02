@@ -49,12 +49,17 @@ class MyGrid(Widget):
             self.reco.text = ""
         else:
             results= database.find_recommends(self.location.text,self.time.text,self.reco.text)
-            self.pop_results('Recommended Locations',results)
+            # checks if the list is empty
+            if(len(results)==0):
+               self.pop_results('Error','No suitable location was found')
+            else:
+                self.pop_results('Recommended Locations', results)
             self.location.text=""
             self.time.text=""
             self.reco.text=""
             # self.database.view()
 
+    """ This function presents pop ups to the user"""
     def pop_results(self,title,results):
         layout = GridLayout(cols = 1, padding = 10)
         if title == 'Recommended Locations':

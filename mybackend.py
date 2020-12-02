@@ -38,7 +38,7 @@ class Database:
         self.conn.commit()
         self.conn.close() # closes the connection
 
-
+    """ This function adds the data to the DB"""
     def add_data(self,fileName,conn,table_name):
         try:
             data = pd.read_csv(fileName)
@@ -46,18 +46,27 @@ class Database:
         except ValueError:
             return
 
-    """Performing a query, commit and close"""
+    """This function performing a query, commit and close"""
+    """ later on the function sorts the output and return the places that was found suitable"""
     def find_recommends(self, place, duration, num_of_results):
         self.conn = sqlite3.connect('database.db')
         self.cur = self.conn.cursor()
         self.cur.execute("SELECT * FROM dataTable WHERE StartStationName=? AND TripDurationinmin<=?", (place,duration))
-        rows_location=self.cur.fetchall()
+        rows_location_before_sort=self.cur.fetchall()
+        # sorting the output of the query according to the duration and the date
+        rows_location=sorted(rows_location_before_sort, key=lambda x: (x[15], x[1]), reverse=True)
+        # checks if the output of the query is empty
         if len(rows_location)==0:
             return rows_location
         places={}
+        counter=0
         for i in range(len(rows_location)):
-            if len(places)<=int(num_of_results):
-                places[rows_location[i][8]]=rows_location[i][15]
+            # checks if the length of the places's list is not bigger than what the user asked for
+            if counter<int(num_of_results):
+                # checks if the place is not in the list and that its not the input from the user
+                if rows_location[i][8] != place and rows_location[i][8] not in places:
+                    places[rows_location[i][8]]=rows_location[i][15]
+                    counter+=1
             else:
                 return list(places.keys())
 
